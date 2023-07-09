@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "270736370592",
+    "project_id": "iride-10538",
+    "storage_bucket": "iride-10538.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270736370592:android:f5ff39c5b4e012018452c5",
+        "android_client_info": {
+          "package_name": "elfak.mosis.iride"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270736370592-4bcebgahqplrmjqbufm4d0f8sjahiqe8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfg8rnw7Za-h6dUbIllc-9lE3p_TMENb0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270736370592-4bcebgahqplrmjqbufm4d0f8sjahiqe8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
