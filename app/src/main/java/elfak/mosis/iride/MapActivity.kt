@@ -116,9 +116,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val car = clickedMarker.tag as? Car
             if (car != null) {
                 CarUtils.showCarDialog(this, car)
-                true // Return true to indicate that the event has been consumed
+                true
             } else {
-                false // Return false if the event is not consumed
+                false
             }
         }
     }
@@ -175,7 +175,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         ) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         } else {
-            // Handle the case when location permission is not granted
             showLocationSettingsDialog()
         }
     }
@@ -313,7 +312,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 //dialog.findViewById<Spinner>(R.id.brandSpinner1)
             brandSpinner.adapter = brandAdapter
         }.addOnFailureListener { exception ->
-            // Handle failure to retrieve brands
+            Log.e("Exception", exception.toString())
         }
     }
 
@@ -333,7 +332,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             val modelSpinner = spinner//= dialog.findViewById<Spinner>(R.id.modelSpinner)
             modelSpinner.adapter = modelAdapter
         }.addOnFailureListener { exception ->
-            // Handle failure to retrieve models
+            Log.e("Exception", exception.toString())
         }
     }
 
@@ -348,21 +347,19 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     /*override fun onMapReady(p0: GoogleMap) {
         p0?.let {
             googleMap = it
-            // Add your implementation for handling the map initialization and interaction
+
         }
     }*/
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
 
-        // Enable the user's location on the map
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED
         ) {
             googleMap.isMyLocationEnabled = true
         }
 
-        //Retrieving all cars
         CarUtils.retrieveAllCars { cars ->
             carList = ArrayList(cars)
             Log.d("MapActivity", "Car List: $carList")

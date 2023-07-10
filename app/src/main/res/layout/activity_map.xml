@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
-
     <SeekBar
         android:id="@+id/seekBar2"
         android:layout_width="265dp"
@@ -16,7 +15,6 @@
         app:layout_constraintHorizontal_bias="0.109"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
-
 
     <TextView
         android:id="@+id/textView"

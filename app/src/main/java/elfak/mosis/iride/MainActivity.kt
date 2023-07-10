@@ -36,6 +36,7 @@
         private lateinit var btnMap: ImageButton
         private lateinit var addCar: ImageButton
         private lateinit var filterBtn: ImageButton
+        private lateinit var sortBtn: ImageButton
         private lateinit var profileBtn: ImageButton
         private lateinit var databaseReference: DatabaseReference
         private lateinit var carListRecyclerView: RecyclerView
@@ -60,6 +61,7 @@
             addCar = findViewById(R.id.btnAddCar)
             btnMap = findViewById(R.id.btnMap)
             filterBtn = findViewById(R.id.btnFilterMain)
+            sortBtn = findViewById(R.id.sortBtn)
             profileBtn = findViewById(R.id.btnProfile)
 
             btnMap.setOnClickListener{
@@ -82,24 +84,49 @@
                 startActivity(intentProfile)
             }
 
+            sortBtn.setOnClickListener {
+                showSortDialog()
+            }
+
         }
 
-        override fun onResume() {
+       private fun showSortDialog() {
+           val options = arrayOf("Standard", "Rating Ascending", "Rating Descending", "Older", "Newer")
+
+           val builder = AlertDialog.Builder(this)
+           builder.setTitle("Sort Options")
+           builder.setItems(options) { dialog, which ->
+               when (which) {
+                   0 -> {
+                       dialog.dismiss()
+                   }
+                   1 -> {
+                       // Rating Ascending
+                   }
+                   2 -> {
+                       // Rating Descending
+                   }
+                   3 -> {
+                       // Older
+                   }
+                   4 -> {
+                       // Newer 
+                   }
+               }
+               dialog.dismiss()
+           }
+           builder.create().show()
+       }
+
+       override fun onResume() {
             super.onResume()
             retrieveAllCars()
         }
 
         private fun initView() {
-            // Find the car list RecyclerView from the layout
             carListRecyclerView = findViewById(R.id.carListRecyclerView)
-
-            // Set up the RecyclerView with a layout manager
             carListRecyclerView.layoutManager = GridLayoutManager(this, 2)
-
-            // Create an instance of the CarListAdapter
             carListAdapter = CarListAdapter(emptyList())
-
-            // Set the adapter on the RecyclerView
             carListRecyclerView.adapter = carListAdapter
         }
 
@@ -185,7 +212,6 @@
                Log.d("Car List:","$carList")
 
                carListAdapter.setOnCarClickListener(this@MainActivity)
-               // Update the adapter with the new car list
                carListAdapter.setCars(carList)
            }
         }
@@ -277,29 +303,22 @@
                 filterByKeyword(keyword)
             }
 
-            // Set click listeners for buttons
             applyButton.setOnClickListener {
-                // Handle the "Apply" button click
                 selectedYearFrom = yearFrom.text.toString().toIntOrNull()
                 selectedYearTo = yearTo.text.toString().toIntOrNull()
 
                 Toast.makeText(this, "Filter applied", Toast.LENGTH_SHORT).show()
-                dialog.dismiss() // Dismiss the dialog
+                dialog.dismiss()
 
                 filter(selectedBrand, selectedModel, selectedCategory, selectedFuelType, selectedTransmissionType, selectedYearFrom, selectedYearTo)
 
-
-                // Use the selectedCategory and selectedFuelType for filtering
-                // Add your filtering logic here
             }
 
             cancelButton.setOnClickListener {
-                // Handle the "Cancel" button click
-                dialog.dismiss() // Dismiss the dialog
+                dialog.dismiss()
                 retrieveAllCars()
             }
 
-            // Show the custom dialog
             dialog.show()
         }
 
@@ -354,7 +373,7 @@
                 //dialog.findViewById<Spinner>(R.id.brandSpinner1)
                 brandSpinner.adapter = brandAdapter
             }.addOnFailureListener { exception ->
-                // Handle failure to retrieve brands
+                Log.e("Exception", exception.toString())
             }
         }
 
@@ -371,10 +390,10 @@
                     dialog.context, android.R.layout.simple_spinner_item, modelListWithNull
                 )
                 modelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                val modelSpinner = spinner//= dialog.findViewById<Spinner>(R.id.modelSpinner)
+                val modelSpinner = spinner
                 modelSpinner.adapter = modelAdapter
             }.addOnFailureListener { exception ->
-                // Handle failure to retrieve models
+                Log.e("Exception", exception.toString())
             }
         }
 
@@ -387,7 +406,6 @@
             val dialog = Dialog(this)
             dialog.setContentView(R.layout.car_dialog)
 
-            // Initialize and set up the dialog content with car details
             val dialogCarPic: ImageView = dialog.findViewById(R.id.dialogCarPic)
             val textViewCarMake: TextView = dialog.findViewById(R.id.cdBrand)
             val textViewCarModel: TextView = dialog.findViewById(R.id.cdModel)
@@ -399,7 +417,6 @@
             val rentButton: Button = dialog.findViewById(R.id.btnRentCar)
 
             val ratingText = String.format("(%d) %.1f/5", car.numOfRatings, car.rating)
-            // Set car data to the views
             Glide.with(dialog.context)
                 .load(car.carImage)
                 .placeholder(R.drawable.car_placeholder)
@@ -424,135 +441,3 @@
         }
 
     }
-
-/*
-package elfak.mosis.iride
-
-import CarListAdapter
-import android.app.Dialog
-import android.content.Intent
-import android.location.Location
-import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import java.nio.charset.Charset
-
-class MainActivity : AppCompatActivity(), CarListAdapter.OnCarClickListener {
-
-    private lateinit var btnMap: ImageButton
-    private lateinit var addCar: ImageButton
-    private lateinit var filterBtn: ImageButton
-    private lateinit var profileBtn: ImageButton
-    private lateinit var databaseReference: DatabaseReference
-    private lateinit var carListRecyclerView: RecyclerView
-    private lateinit var carListAdapter: CarListAdapter
-    private lateinit var storage: FirebaseStorage
-    private lateinit var storageReference: StorageReference
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        storage = FirebaseStorage.getInstance()
-        storageReference = storage.reference.child("brands_models")
-        databaseReference = FirebaseDatabase.getInstance().reference
-
-        retrieveAllCars()
-        initView()
-
-
-        addCar = findViewById(R.id.btnAddCar)
-        btnMap = findViewById(R.id.btnMap)
-        filterBtn = findViewById(R.id.btnFilterMain)
-        profileBtn = findViewById(R.id.btnProfile)
-
-        btnMap.setOnClickListener{
-            val intentRentCar = Intent(this, MapActivity::class.java)
-            startActivity(intentRentCar)
-        }
-
-        addCar.setOnClickListener{
-            val intentAddCar = Intent(this, AddCarActivity::class.java)
-            startActivity(intentAddCar)
-        }
-
-        filterBtn.setOnClickListener{
-            CarUtils.showFilterDialog(this)
-        }
-
-        profileBtn.setOnClickListener{
-            val intentProfile = Intent(this, ProfileActivity::class.java)
-            startActivity(intentProfile)
-        }
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        retrieveAllCars()
-    }
-
-    private fun initView() {
-        // Find the car list RecyclerView from the layout
-        carListRecyclerView = findViewById(R.id.carListRecyclerView)
-
-        // Set up the RecyclerView with a layout manager
-        carListRecyclerView.layoutManager = GridLayoutManager(this, 2)
-
-        // Create an instance of the CarListAdapter
-        carListAdapter = CarListAdapter(emptyList())
-
-        // Set the adapter on the RecyclerView
-        carListRecyclerView.adapter = carListAdapter
-    }
-
-    */
-/*private fun retrieveAllCars() {
-        CarUtils.retrieveAllCars(databaseReference, this) { carList ->
-            carListAdapter.setOnCarClickListener(this)
-
-            // Update the adapter with the new car list
-            carListAdapter.setCars(carList)
-        }
-    }*//*
-
-
-    private fun retrieveAllCars() {
-        CarUtils.retrieveAllCars(databaseReference, this) { carList ->
-            carListAdapter.setOnCarClickListener(this)
-
-            // Update the adapter with the new car list
-            carListAdapter.setCars(carList)
-
-            // Notify the adapter that the data set has changed
-            carListAdapter.notifyDataSetChanged()
-        }
-    }
-
-
-    override fun onCarClick(car: Car) {
-        CarUtils.showCarDialog(this, car)
-    }
-}
-
-*/

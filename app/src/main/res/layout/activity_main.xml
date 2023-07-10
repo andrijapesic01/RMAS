@@ -82,5 +82,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/filter_img" />
 
+    <ImageButton
+        android:id="@+id/sortBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/btnFilterMain"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/sort_icon" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

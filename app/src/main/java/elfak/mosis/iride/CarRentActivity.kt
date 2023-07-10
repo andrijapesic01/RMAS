@@ -84,7 +84,6 @@ class CarRentActivity : AppCompatActivity() {
         btnRate.setOnClickListener {
             val rating = ratingBar.rating
 
-            // Call the rateCar function passing the car and the rating
             CarUtils.rateCar(car, rating)
 
             alertDialog.dismiss()

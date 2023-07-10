@@ -237,11 +237,11 @@ class AddCarActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    // Handle the case when the location is not available
+                    Log.e("Location Error", "Location not available!")
                 }
             }
             .addOnFailureListener { exception ->
-                // Handle location retrieval failure
+                Log.e("Exception", exception.toString())
             }
     }
 
@@ -266,7 +266,7 @@ class AddCarActivity : AppCompatActivity() {
             brandAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             brandSpinner.adapter = brandAdapter
         }.addOnFailureListener { exception ->
-            // Handle failure to retrieve brands
+            Log.e("Exception", exception.toString())
         }
     }
 
@@ -283,7 +283,7 @@ class AddCarActivity : AppCompatActivity() {
             modelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             modelSpinner.adapter = modelAdapter
         }.addOnFailureListener { exception ->
-            // Handle failure to retrieve models
+            Log.e("Exception", exception.toString())
         }
     }
 
@@ -296,14 +296,13 @@ class AddCarActivity : AppCompatActivity() {
                     if (location != null) {
                         this.location = location
                     } else {
-                        // Handle the case when last known location is not available
+                        Log.e("Location Error", "Location not available!")
                     }
                 }
                 .addOnFailureListener { exception ->
-                    // Handle location retrieval failure
+                    Log.e("Exception", exception.toString())
                 }
         } else {
-            // Handle the case when location permission is not granted
             showLocationSettingsDialog()
         }
     }

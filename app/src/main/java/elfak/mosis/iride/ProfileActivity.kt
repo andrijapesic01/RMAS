@@ -149,10 +149,8 @@ class ProfileActivity : AppCompatActivity() {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.leaderboard_dialog, null)
         val tableLayout = dialogView.findViewById<TableLayout>(R.id.leaderboardTable)
 
-        // Retrieve user data from Firebase and rank them based on score
         val leaderboardData = ArrayList<Pair<String, Int>>()
 
-        // Assuming you have a Firebase reference to the users collection
         val usersRef = FirebaseDatabase.getInstance().reference.child("users")
 
         usersRef.orderByChild("score").addListenerForSingleValueEvent(object : ValueEventListener {
@@ -160,7 +158,6 @@ class ProfileActivity : AppCompatActivity() {
                 // Clear previous data
                 leaderboardData.clear()
 
-                // Iterate through the dataSnapshot to retrieve user data and scores
                 for (userSnapshot in dataSnapshot.children) {
                     val firstName = userSnapshot.child("firstName").value as String
                     val lastName = userSnapshot.child("lastName").value as String
@@ -170,10 +167,8 @@ class ProfileActivity : AppCompatActivity() {
                     leaderboardData.add(Pair(fullName, score.toInt()))
                 }
 
-                // Sort the leaderboard data based on score in descending order
                 leaderboardData.sortByDescending { it.second }
 
-                // Display the leaderboard data in the table
                 for (i in leaderboardData.indices) {
                     val entry = leaderboardData[i]
                     val row = TableRow(this@ProfileActivity)
@@ -186,7 +181,6 @@ class ProfileActivity : AppCompatActivity() {
                     scoreTextView.text = entry.second.toString()
                     nameTextView.text = entry.first
 
-                    // Set layout weight to distribute the columns evenly
                     rankTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
                     scoreTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
                     nameTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
@@ -195,7 +189,6 @@ class ProfileActivity : AppCompatActivity() {
                     scoreTextView.gravity = Gravity.CENTER
                     nameTextView.gravity = Gravity.CENTER
 
-                    // Highlight the current user's row
                     if (currentUser != null && entry.first == currentUser.uid) {
                         rankTextView.setTextColor(Color.RED)
                         scoreTextView.setTextColor(Color.RED)
@@ -215,7 +208,7 @@ class ProfileActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Handle the error if fetching data from Firebase fails
+                Log.e("Database error:", databaseError.toString())
             }
         })
 

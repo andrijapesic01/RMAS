@@ -108,20 +108,17 @@ class LoginActivity : AppCompatActivity() {
         when (requestCode) {
             CAMERA_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Camera permission
                     checkLocationPermission()
                 } else {
-                    // Camera permission denied
                     checkCameraPermission()
                     //Toast.makeText(this, "Camera permission denied. You may not be able to use camera-related features.", Toast.LENGTH_SHORT).show()
                 }
             }
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Location permissions granted
-                    // Proceed with login activity logic
+
                 } else {
-                    // Location permissions denied
+
                     checkLocationPermission()
                     //Toast.makeText(this, "Location permission denied. You may not be able to use location-related features.", Toast.LENGTH_SHORT).show()
                 }

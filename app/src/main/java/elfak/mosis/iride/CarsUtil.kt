@@ -3,6 +3,7 @@
     import android.app.Dialog
     import android.content.Context
     import android.location.Location
+    import android.util.Log
     import android.view.View
     import android.widget.AdapterView
     import android.widget.ArrayAdapter
@@ -90,7 +91,7 @@
                                 }
 
                                 override fun onCancelled(databaseError: DatabaseError) {
-                                    // Handle any errors that occur during the retrieval
+                                    Log.e("Database Error", databaseError.toString())
                                 }
                             })
                         }
@@ -98,7 +99,7 @@
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle any errors that occur during the retrieval
+                    Log.e("Database Error", databaseError.toString())
                 }
             })
         }
@@ -113,7 +114,6 @@
                     //val carList = mutableListOf<Car>()
                     //carList.clear()
 
-                    // Iterate through all users
                     for (userSnapshot in dataSnapshot.children) {
                         val userId = userSnapshot.key
 
@@ -122,9 +122,7 @@
 
                             carsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onDataChange(carsSnapshot: DataSnapshot) {
-                                    // Retrieve all cars for the current user
                                     for (carSnapshot in carsSnapshot.children) {
-                                        // Manually deserialize the Car object
                                         val carMap = carSnapshot.getValue(object : GenericTypeIndicator<HashMap<String, Any>>() {})
                                         if (carMap != null) {
                                             val rented = carMap["rented"] as? Boolean ?: false
@@ -146,11 +144,7 @@
                                                     carMap["rating"] as? Float ?: 0f,
                                                     carMap["numOfRatings"] as? Int ?: 0
                                                 )
-
-                                                // You can also log the car object as a whole
                                                 //Log.d("CarData", "Car Object: $carObject")
-
-                                                // Add the car to the list
                                                 carList.add(carObject)
                                             }
                                         }
@@ -159,7 +153,7 @@
                                 }
 
                                 override fun onCancelled(databaseError: DatabaseError) {
-                                    // Handle any errors that occur during the retrieval
+                                    Log.e("Database Error", databaseError.toString())
                                 }
                             })
                         }
@@ -167,7 +161,7 @@
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle any errors that occur during the retrieval
+                    Log.e("Database Error", databaseError.toString())
                 }
             })
         }
@@ -262,7 +256,7 @@
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {
-                        // Do nothing
+
                     }
                 }
             }
@@ -276,8 +270,6 @@
                 val selectedTransmission = transmissionSpinner.selectedItem.toString()
                 val selectedCategory = categorySpinner.selectedItem.toString()
 
-                // Apply filter logic
-                // ...
 
                 dialog.dismiss()
             }

@@ -47,7 +47,8 @@
         android:layout_marginBottom="16dp"
         android:text="Stop Renting"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="133dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView2"
