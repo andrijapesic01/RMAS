@@ -4,15 +4,14 @@ import android.content.Intent
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
-import java.time.Duration
 
 class CarRentActivity : AppCompatActivity() {
 
@@ -36,7 +35,6 @@ class CarRentActivity : AppCompatActivity() {
         distance = findViewById(R.id.tvDistance)
         stopBtn = findViewById(R.id.StopRentBtn)
 
-
         val car: Car? = intent.getSerializableExtra("car") as? Car
 
         if (car != null) {
@@ -58,7 +56,7 @@ class CarRentActivity : AppCompatActivity() {
             distance.text = "1000"
             duration.text = "0000"
         } else {
-            // Handle the case when car data is null
+            Log.e("Error: ", "Car is null")
         }
 
         stopBtn.setOnClickListener{
@@ -74,7 +72,6 @@ class CarRentActivity : AppCompatActivity() {
         val ratingBar = dialogView.findViewById<RatingBar>(R.id.ratingBar)
         val btnRate = dialogView.findViewById<Button>(R.id.btnRate)
 
-
         val dialogBuilder = AlertDialog.Builder(this)
             .setView(dialogView)
             .setTitle("Please rate this car")
@@ -83,6 +80,8 @@ class CarRentActivity : AppCompatActivity() {
 
         btnRate.setOnClickListener {
             val rating = ratingBar.rating
+
+            Log.d("Rating test", "$rating")
 
             CarUtils.rateCar(car, rating)
 
