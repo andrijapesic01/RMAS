@@ -1,8 +1,10 @@
     package elfak.mosis.iride
 
+    import android.app.Activity
     import android.app.Dialog
     import android.content.Context
     import android.content.Intent
+    import android.location.Location
     import android.util.Log
     import android.view.View
     import android.widget.AdapterView
@@ -17,6 +19,7 @@
     import androidx.appcompat.app.AlertDialog
     import androidx.core.content.ContextCompat.startActivity
     import com.bumptech.glide.Glide
+    import com.google.android.gms.maps.model.LatLng
     import com.google.firebase.database.DataSnapshot
     import com.google.firebase.database.DatabaseError
     import com.google.firebase.database.DatabaseReference
@@ -33,84 +36,92 @@
         private val storage: FirebaseStorage = FirebaseStorage.getInstance()
         private val storageReference: StorageReference = storage.reference.child("brands_models")
 
-        fun rateCar(car: Car, rating: Float) {
-            val usersRef = databaseReference.child("users")
+        fun changeCarStatus(car: Car, rented: Boolean) {
+            val userId = car.userId
+            val carRef = databaseReference.child("users").child(userId).child("cars")
 
-            usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    for (userSnapshot in dataSnapshot.children) {
-                        val userId = userSnapshot.key
+            carRef.orderByChild("brand").equalTo(car.brand)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        for (childSnapshot in dataSnapshot.children) {
+                            val carSnapshot = childSnapshot.getValue(Car::class.java)
+                            if (carSnapshot != null && carSnapshot.model == car.model) {
+                                val carId = childSnapshot.key
 
-                        if (userId != null) {
-                            val carsRef = databaseReference.child("users").child(userId).child("cars")
-
-                            carsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(carsSnapshot: DataSnapshot) {
-                                    for (carSnapshot in carsSnapshot.children) {
-                                        val carMap = carSnapshot.getValue(object : GenericTypeIndicator<HashMap<String, Any>>() {})
-                                        if (carMap != null) {
-                                            val rented = carMap["rented"] as? Boolean ?: false
-
-                                            if (rented) {
-                                                val carObject = Car(
-                                                    userId,
-                                                    carMap["brand"] as? String ?: "",
-                                                    carMap["model"] as? String ?: "",
-                                                    carMap["fuel"] as? String ?: "",
-                                                    carMap["category"] as? String ?: "",
-                                                    (carMap["year"] as? String)?.toIntOrNull() ?: 0,
-                                                    carMap["transmission"] as? String ?: "",
-                                                    carMap["latitude"] as? Number ?: 0,
-                                                    carMap["longitude"] as? Number ?: 0,
-                                                    carMap["carImage"] as? String ?: "",
-                                                    carMap["rented"] as? Boolean ?: false,
-                                                    carMap["openKey"] as? String ?: "",
-                                                    carMap["rating"] as? Float ?: 0f,
-                                                    carMap["numOfRatings"] as? Int ?: 0
-                                                )
-
-                                                if (carObject == car) {
-                                                    val carToUpdateRef = carSnapshot.ref
-
-                                                    val currentRating = carObject.rating
-                                                    val numOfRatings = carObject.numOfRatings
-
-                                                    val newNumOfRatings = numOfRatings + 1
-                                                    val newRating = ((currentRating * numOfRatings) + rating) / newNumOfRatings
-
-                                                    carToUpdateRef.child("rating").setValue(newRating)
-                                                        .addOnSuccessListener {
-                                                            carToUpdateRef.child("numOfRatings").setValue(newNumOfRatings)
-                                                                .addOnSuccessListener {
-                                                                    println("Rating and numOfRatings updated successfully.")
-                                                                }
-                                                                .addOnFailureListener { e ->
-                                                                    println("Error updating numOfRatings: $e")
-                                                                }
-                                                        }
-                                                        .addOnFailureListener { e ->
-                                                            println("Error updating rating: $e")
-                                                        }
-
-                                                    return
-                                                }
-                                            }
-                                        }
+                                carRef.child(carId!!).child("rented").setValue(rented)
+                                    .addOnSuccessListener {
                                     }
-                                }
+                                    .addOnFailureListener { exception ->
+                                        Log.e("Exception:", exception.toString())
+                                    }
 
-                                override fun onCancelled(databaseError: DatabaseError) {
-                                    Log.e("Database Error", databaseError.toString())
-                                }
-                            })
+                                break
+                            }
                         }
                     }
-                }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("Database Error", databaseError.toString())
-                }
-            })
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Log.e("DB error: ", databaseError.toString())
+                    }
+                })
+        }
+
+        fun rateAndUpdateCar(car: Car, rating: Float, location: Location) {
+            val userId = car.userId
+            val carRef = databaseReference.child("users").child(userId).child("cars")
+
+            carRef.orderByChild("brand").equalTo(car.brand)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        for (childSnapshot in dataSnapshot.children) {
+                            val carSnapshot = childSnapshot.getValue(Car::class.java)
+                            if (carSnapshot != null && carSnapshot.model == car.model) {
+                                val carId = childSnapshot.key
+
+                                val currentRating = carSnapshot.rating.toDouble()
+                                val numOfRatings = carSnapshot.numOfRatings.toInt()
+
+                                val newNumOfRatings = numOfRatings + 1
+                                val newRating = ((currentRating * numOfRatings) + rating) / newNumOfRatings
+
+                                carSnapshot.latitude = location.latitude
+                                carSnapshot.longitude = location.longitude
+
+                                carRef.child(carId!!).child("rating").setValue(newRating.toString())
+                                    .addOnSuccessListener {
+                                        carRef.child(carId).child("numOfRatings").setValue(newNumOfRatings.toString())
+                                            .addOnSuccessListener {
+                                                carRef.child(carId).child("latitude").setValue(location.latitude)
+                                                    .addOnSuccessListener {
+                                                        carRef.child(carId).child("longitude").setValue(location.longitude)
+                                                            .addOnSuccessListener {
+                                                                println("Car rating, numOfRatings, and location updated successfully.")
+                                                            }
+                                                            .addOnFailureListener { e ->
+                                                                println("Error updating car location: $e")
+                                                            }
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        println("Error updating car location: $e")
+                                                    }
+                                            }
+                                            .addOnFailureListener { e ->
+                                                println("Error updating numOfRatings: $e")
+                                            }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        println("Error updating rating: $e")
+                                    }
+
+                                break
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Log.e("DB error:", databaseError.toString())
+                    }
+                })
         }
 
         fun retrieveAllCars(callback: (List<Car>) -> Unit) {
@@ -130,7 +141,7 @@
                             val carsRef = databaseReference.child("users").child(userId).child("cars")
 
                             carsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(carsSnapshot: DataSnapshot) {
+                               override fun onDataChange(carsSnapshot: DataSnapshot) {
                                     for (carSnapshot in carsSnapshot.children) {
                                         val carMap = carSnapshot.getValue(object : GenericTypeIndicator<HashMap<String, Any>>() {})
                                         if (carMap != null) {
@@ -143,21 +154,23 @@
                                                     carMap["model"] as? String ?: "",
                                                     carMap["fuel"] as? String ?: "",
                                                     carMap["category"] as? String ?: "",
-                                                    (carMap["year"] as? String)?.toIntOrNull() ?: 0,
+                                                    carMap["year"] as? String ?: "0",
                                                     carMap["transmission"] as? String ?: "",
-                                                    carMap["latitude"] as? Number ?: 0,
-                                                    carMap["longitude"] as? Number ?: 0,
+                                                    carMap["latitude"] as? Double ?: 0.0,
+                                                    carMap["longitude"] as? Double ?: 0.0,
                                                     carMap["carImage"] as? String ?: "",
                                                     carMap["rented"] as? Boolean ?: false,
                                                     carMap["openKey"] as? String ?: "",
-                                                    carMap["rating"] as? Float ?: 0f,
-                                                    carMap["numOfRatings"] as? Int ?: 0
+                                                    carMap["rating"] as? String ?: "0",
+                                                    carMap["numOfRatings"] as? String ?: "0",
+                                                    carMap["dateAdded"] as? String ?: "0"
                                                 )
                                                 //Log.d("CarData", "Car Object: $carObject")
                                                 carList.add(carObject)
                                             }
                                         }
                                     }
+
                                     callback(carList)
                                 }
 
@@ -226,8 +239,8 @@
 
         }
 
-        fun showCarDialog(context: Context, car: Car) {
-            val dialog = Dialog(context)
+        fun showCarDialog(activity: Activity, car: Car) {
+            val dialog = Dialog(activity)
             dialog.setContentView(R.layout.car_dialog)
 
             val dialogCarPic: ImageView = dialog.findViewById(R.id.dialogCarPic)
@@ -240,7 +253,7 @@
             val textViewCarRating: TextView = dialog.findViewById(R.id.cdRating)
             val rentButton: Button = dialog.findViewById(R.id.btnRentCar)
 
-            val ratingText = String.format("(%d) %.1f/5", car.numOfRatings, car.rating)
+            val ratingText = String.format("(%s) %.1f/5", car.numOfRatings, car.rating.toFloat())
             Glide.with(dialog.context)
                 .load(car.carImage)
                 .placeholder(R.drawable.car_placeholder)
@@ -254,12 +267,12 @@
             textViewCarTransmission.text = car.transmission
             textViewCarRating.text = ratingText
 
-            /*rentButton.setOnClickListener{
-                val intentRentCar = Intent(context, CarRentActivity::class.java)
+            rentButton.setOnClickListener{
+                val intentRentCar = Intent(activity, CarRentActivity::class.java)
                 intentRentCar.putExtra("car", car)
-                startActivity(intentRentCar)
-                finish()
-            }*/
+                activity.startActivity(intentRentCar)
+                activity.finish()
+            }
 
             dialog.show()
         }
@@ -276,8 +289,6 @@
             var selectedYearFrom: Number? = null
             var selectedYearTo: Number? = null
 
-            val keyword: EditText = dialog.findViewById(R.id.keywordInput)
-            val keywordSearchButton: ImageButton = dialog.findViewById(R.id.keyWordSearch)
             val applyButton: Button = dialog.findViewById(R.id.applyButton)
             val cancelButton: Button = dialog.findViewById(R.id.resetBtn)
             val categorySpinner: Spinner = dialog.findViewById(R.id.categorySpinner1)
@@ -305,7 +316,6 @@
             transmissionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             transmissionSpinner.adapter = transmissionTypeAdapter
 
-            //On items selected
             brandSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     val brand = if (position == 0) null else parent?.getItemAtPosition(position) as String
@@ -345,12 +355,6 @@
                 }
             }
 
-            keywordSearchButton.setOnClickListener{
-                //Toast.makeText(this, "Results for: $keyword", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
-                //filterByKeyword(keyword)
-            }
-
             applyButton.setOnClickListener {
                 selectedYearFrom = yearFrom.text.toString().toIntOrNull()
                 selectedYearTo = yearTo.text.toString().toIntOrNull()
@@ -382,8 +386,8 @@
                 val matchesCategory = selectedCategory == null || car.category == selectedCategory
                 val matchesFuelType = selectedFuelType == null || car.fuel == selectedFuelType
                 val matchesTransmissionType = selectedTransmissionType == null || car.transmission == selectedTransmissionType
-                val matchesYearFrom = selectedYearFrom == null || car.year >= selectedYearFrom.toInt()
-                val matchesYearTo = selectedYearTo == null || car.year <= selectedYearTo.toInt()
+                val matchesYearFrom = selectedYearFrom == null || car.year.toInt() >= selectedYearFrom.toInt()
+                val matchesYearTo = selectedYearTo == null || car.year.toInt() <= selectedYearTo.toInt()
 
                 if (matchesBrand && matchesModel && matchesCategory && matchesFuelType && matchesTransmissionType && matchesYearFrom && matchesYearTo) {
                     filteredCars.add(car)
@@ -404,13 +408,23 @@
         }
 
         fun sortByRatingAscending(carList: MutableList<Car>, callback: (MutableList<Car>) -> Unit) {
-            carList.sortBy { it.rating }
+            carList.sortBy { it.rating.toDouble() }
             callback(carList)
         }
 
         fun sortByRatingDescending(carList: MutableList<Car>, callback: (MutableList<Car>) -> Unit) {
-            carList.sortByDescending { it.rating }
+            carList.sortByDescending { it.rating.toDouble() }
             callback(carList)
+        }
+
+        fun calculateDistance(location1: LatLng, location2: LatLng): Float {
+            val results = FloatArray(1)
+            Location.distanceBetween(
+                location1.latitude, location1.longitude,
+                location2.latitude, location2.longitude,
+                results
+            )
+            return results[0]
         }
 
     }

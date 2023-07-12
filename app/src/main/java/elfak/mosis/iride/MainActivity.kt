@@ -25,6 +25,9 @@
     import com.google.firebase.storage.FirebaseStorage
     import com.google.firebase.storage.StorageReference
     import java.nio.charset.Charset
+    import java.text.SimpleDateFormat
+    import java.util.Date
+    import java.util.Locale
 
    class MainActivity : AppCompatActivity(), CarListAdapter.OnCarClickListener {
 
@@ -92,43 +95,41 @@
        }
 
        private fun showSortDialog() {
-           val options = arrayOf("Rating Ascending", "Rating Descending", "Older", "Newer")
+           val options = arrayOf("Rating Ascending", "Rating Descending", "Date added: Older", "Date added: Newer")
 
            val builder = AlertDialog.Builder(this)
            builder.setTitle("Sort Options")
            builder.setItems(options) { dialog, which ->
                when (which) {
                    0 -> {
-                       // Rating Ascending
-                       CarUtils.sortByRatingAscending(carList) { updatedCarList ->
-                           Log.d("CARS:", "$updatedCarList")
-                           carList.clear()
-                           carList.addAll(updatedCarList)
-                           carListAdapter.notifyDataSetChanged()
-                       }
+                       carList.sortBy { it.rating.toFloat() }
+                       carListAdapter.notifyDataSetChanged()
                    }
                    1 -> {
-                       // Rating Descending
-                       CarUtils.sortByRatingDescending(carList){ updatedCarList ->
-                           carList.clear()
-                           carList.addAll(updatedCarList)
-                           carListAdapter.notifyDataSetChanged()
-                       }
+                       carList.sortByDescending { it.rating.toFloat() }
+                       carListAdapter.notifyDataSetChanged()
+
                    }
                    2 -> {
-                       // Older
-                       //CarUtils.sortOlder(carList)
+                       Log.d("pre", "$carList")
+                       carList.sortBy { formatDate(it.dateAdded.toLong()) }
+                       Log.d("posle", "$carList")
                        carListAdapter.notifyDataSetChanged()
                    }
                    3 -> {
-                       // Newer
-                       //CarUtils.sortNewer(carList)
+                       carList.sortByDescending { formatDate(it.dateAdded.toLong()) }
                        carListAdapter.notifyDataSetChanged()
                    }
                }
                dialog.dismiss()
            }
            builder.create().show()
+       }
+
+       fun formatDate(dateInMillis: Long): String {
+           val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.getDefault())
+           val date = Date(dateInMillis)
+           return dateFormat.format(date)
        }
 
        override fun onResume() {
@@ -153,51 +154,11 @@
             }
         }
 
-        private fun filterByKeyword(keyword: EditText) {
-            //Delete
-        }
-
        override fun onCarClick(car: Car) {
            showCarDialog(car)
        }
 
-       //Add rating
        private fun showCarDialog(car: Car) {
-            val dialog = Dialog(this)
-            dialog.setContentView(R.layout.car_dialog)
-
-            val dialogCarPic: ImageView = dialog.findViewById(R.id.dialogCarPic)
-            val textViewCarMake: TextView = dialog.findViewById(R.id.cdBrand)
-            val textViewCarModel: TextView = dialog.findViewById(R.id.cdModel)
-            val textViewCarYear: TextView = dialog.findViewById(R.id.cdYear)
-            val textViewCarCategory: TextView = dialog.findViewById(R.id.cdCategory)
-            val textViewCarFuelType: TextView = dialog.findViewById(R.id.cdFuel)
-            val textViewCarTransmission: TextView = dialog.findViewById(R.id.cdTransmission)
-            val textViewCarRating: TextView = dialog.findViewById(R.id.cdRating)
-            val rentButton: Button = dialog.findViewById(R.id.btnRentCar)
-
-            val ratingText = String.format("(%d) %.1f/5", car.numOfRatings, car.rating)
-            Glide.with(dialog.context)
-                .load(car.carImage)
-                .placeholder(R.drawable.car_placeholder)
-                .into(dialogCarPic)
-
-            textViewCarMake.text = car.brand
-            textViewCarModel.text = car.model
-            textViewCarYear.text = car.year.toString()
-            textViewCarCategory.text = car.category
-            textViewCarFuelType.text = car.fuel
-            textViewCarTransmission.text = car.transmission
-            textViewCarRating.text = ratingText
-
-            rentButton.setOnClickListener{
-                val intentRentCar = Intent(this, CarRentActivity::class.java)
-                intentRentCar.putExtra("car", car)
-                startActivity(intentRentCar)
-                finish()
-            }
-
-            dialog.show()
-        }
-
+           CarUtils.showCarDialog(this, car)
+       }
     }

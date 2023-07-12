@@ -1,6 +1,7 @@
 package elfak.mosis.iride
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Build
@@ -11,6 +12,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.Spinner
@@ -51,8 +53,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var storage: FirebaseStorage
     private lateinit var storageReference: StorageReference
+    private lateinit var radius: EditText
+    private lateinit var radiusBtn: ImageButton
     private lateinit var carList: ArrayList<Car>
-
 
     private val MAPVIEW_BUNDLE_KEY = "MapViewBundleKey"
     private val CAMERA_POSITION_KEY = "CameraPositionKey"
@@ -67,6 +70,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         carList = intent.getSerializableExtra("carList") as? ArrayList<Car> ?: ArrayList()
         Log.d("MapActivity", "Car List: $carList")
 
+        radius = findViewById(R.id.edtDistance)
+        radiusBtn = findViewById(R.id.btnDistance)
         filter = findViewById(R.id.filterBtn)
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState?.getBundle(MAPVIEW_BUNDLE_KEY))
@@ -92,11 +97,42 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         requestLocationUpdates()
+
         filter.setOnClickListener {
             showFilterDialog()
         }
 
+        radiusBtn.setOnClickListener{
+            filterByRadius()
+        }
+
        // mapView.getMapAsync(this)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun filterByRadius() {
+        val radius = radius.text.toString().toFloatOrNull()
+
+        if (radius != null) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val userLocation = LatLng(location.latitude, location.longitude)
+                    val filteredCars = carList.filter { car ->
+                        val carLocation = LatLng(car.latitude, car.longitude)
+                        val distance = CarUtils.calculateDistance(userLocation, carLocation) / 1000.0f
+                        distance <= radius
+                    }
+
+                    googleMap.clear()
+                    addMarkersToMap(filteredCars as ArrayList<Car>)
+
+                } else {
+                    Toast.makeText(this, "Unable to retrieve user location.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(this, "Invalid radius value.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun addMarkersToMap(carList: ArrayList<Car>) {

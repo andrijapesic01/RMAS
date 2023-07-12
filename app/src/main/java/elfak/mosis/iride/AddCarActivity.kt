@@ -88,24 +88,8 @@ class AddCarActivity : AppCompatActivity() {
         saveBtn = findViewById(R.id.btnSave)
 
         carPicture.setOnClickListener {
-            val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setTitle("Choose an option")
-            builder.setItems(options) { dialog, item ->
-                when (options[item]) {
-                    "Take Photo" -> {
-                        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        takePictureLauncher.launch(takePictureIntent)
-                    }
-                    "Choose from Gallery" -> {
-                        val pickPhotoIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        pickPhotoIntent.type = "image/*"
-                        takePictureLauncher.launch(pickPhotoIntent)
-                    }
-                    "Cancel" -> dialog.dismiss()
-                }
-            }
-            builder.show()
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            takePictureLauncher.launch(takePictureIntent)
         }
         retrieveBrands()
 
@@ -124,18 +108,15 @@ class AddCarActivity : AppCompatActivity() {
                 model = parent?.getItemAtPosition(position).toString()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                // Handle when no brand is selected
             }
         }
 
-        // Set categories adapter
         val categoryAdapter = ArrayAdapter(
             this, android.R.layout.simple_spinner_item, categories
         )
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = categoryAdapter
 
-        // Set fuel types adapter
         val fuelTypeAdapter = ArrayAdapter(
             this, android.R.layout.simple_spinner_item, fuelTypes
         )
@@ -165,14 +146,14 @@ class AddCarActivity : AppCompatActivity() {
         radioTransmission = findViewById(R.id.radioTransmission)
 
         saveBtn.setOnClickListener {
-            val year = yearPicker.text.toString().toIntOrNull()
+            val year = yearPicker.text.toString()
             val maxYear = Calendar.getInstance().get(Calendar.YEAR)
             val carPicDrawable = carPicture.drawable as BitmapDrawable?
             val carBitmap = carPicDrawable?.bitmap
 
             if (year == null) {
                 Toast.makeText(this, "Please add year of production!", Toast.LENGTH_SHORT).show()
-            } else if (year > maxYear || year < 1900) {
+            } else if (year.toInt() > maxYear || year.toInt() < 1900) {
                 Toast.makeText(this, "Please enter a valid year of production!", Toast.LENGTH_SHORT).show()
             } else if (transmission.isNullOrBlank()) {
                 Toast.makeText(this, "Please select the transmission type!", Toast.LENGTH_SHORT).show()
@@ -182,7 +163,7 @@ class AddCarActivity : AppCompatActivity() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun addCar(brand: String, model: String, fuel: String, category: String, year: Int, transmission: String, carBitmap: Bitmap?) {
+    private fun addCar(brand: String, model: String, fuel: String, category: String, year: String, transmission: String, carBitmap: Bitmap?) {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
                 if (location != null) {
@@ -190,7 +171,7 @@ class AddCarActivity : AppCompatActivity() {
                     val userId = user?.uid
 
                     if (userId != null) {
-                        val car = Car(userId, brand, model, fuel, category, year, transmission, location.latitude, location.longitude,"", false, "", 0f, 0)
+                        val car = Car(userId, brand, model, fuel, category, year, transmission, location.latitude, location.longitude,"", false, "", "0", "0")
 
                         val carImageRef = imageReference.child("car_images").child("$userId-${System.currentTimeMillis()}.jpg")
                         carBitmap?.let { bitmap ->
@@ -204,6 +185,7 @@ class AddCarActivity : AppCompatActivity() {
                                         .addOnSuccessListener { uri ->
                                             val imageUrl = uri.toString()
                                             car.carImage = imageUrl
+                                            car.dateAdded = System.currentTimeMillis().toString()
 
                                             val carsRef = databaseReference.child("users").child(userId).child("cars")
                                             carsRef.push().setValue(car)

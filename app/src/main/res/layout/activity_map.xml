@@ -6,24 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
-    <SeekBar
-        android:id="@+id/seekBar2"
-        android:layout_width="265dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.109"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
     <TextView
         android:id="@+id/textView"
-        android:layout_width="91dp"
-        android:layout_height="26dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="304dp"
-        android:text="Distance:"
+        android:text="Distance (km):"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,12 +23,9 @@
         android:id="@+id/filterFrame"
         android:layout_width="88dp"
         android:layout_height="94dp"
-        android:layout_marginStart="26dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/seekBar2"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -64,14 +51,33 @@
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
-        android:layout_width="392dp"
-        android:layout_height="611dp"
-        android:layout_marginTop="5dp"
+        android:layout_width="389dp"
+        android:layout_height="610dp"
+        android:layout_marginTop="21dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.473"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar2"
-        app:layout_constraintVertical_bias="0.647" />
+        app:layout_constraintTop_toBottomOf="@+id/edtDistance"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <EditText
+        android:id="@+id/edtDistance"
+        android:layout_width="92dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <ImageButton
+        android:id="@+id/btnDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/edtDistance"
+        app:layout_constraintTop_toTopOf="@+id/edtDistance"
+        app:srcCompat="@drawable/distance_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

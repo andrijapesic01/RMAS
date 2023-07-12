@@ -12,7 +12,7 @@
         android:layout_marginTop="12dp"
         android:text="Model"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.066"
+        app:layout_constraintHorizontal_bias="0.085"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/brandSpinner1" />
 
@@ -20,10 +20,10 @@
         android:id="@+id/textView13"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:text="Transmission type"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.054"
+        app:layout_constraintHorizontal_bias="0.118"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fuelTypeSpinner1" />
 
@@ -52,9 +52,9 @@
         android:id="@+id/fuelTypeSpinner1"
         android:layout_width="335dp"
         android:layout_height="35dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.276"
+        app:layout_constraintHorizontal_bias="0.394"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
@@ -62,9 +62,9 @@
         android:id="@+id/modelSpinner1"
         android:layout_width="335dp"
         android:layout_height="35dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.342"
+        app:layout_constraintHorizontal_bias="0.447"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
@@ -83,9 +83,9 @@
         android:id="@+id/categorySpinner1"
         android:layout_width="335dp"
         android:layout_height="35dp"
-        android:layout_marginTop="9dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.21"
+        app:layout_constraintHorizontal_bias="0.407"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView17" />
 
@@ -93,10 +93,10 @@
         android:id="@+id/textView17"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="16dp"
         android:text="Category"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintHorizontal_bias="0.087"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/transmissionSpinner1" />
 
@@ -105,12 +105,11 @@
         android:layout_width="49dp"
         android:layout_height="24dp"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="12dp"
         android:text="Brand"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/keywordInput" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView16"
@@ -156,28 +155,6 @@
         app:layout_constraintStart_toEndOf="@+id/yearFromDP"
         app:layout_constraintTop_toBottomOf="@+id/textView16" />
 
-    <ImageButton
-        android:id="@+id/keyWordSearch"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/keywordInput"
-        app:srcCompat="@android:drawable/ic_menu_search"
-        app:tint="@android:color/black"
-        tools:layout_editor_absoluteY="16dp" />
-
-    <EditText
-        android:id="@+id/keywordInput"
-        android:layout_width="280dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="16dp"
-        android:hint="Enter Keyword"
-        app:layout_constraintEnd_toStartOf="@+id/keyWordSearch"
-        app:layout_constraintHorizontal_bias="0.585"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/applyButton"
         android:layout_width="wrap_content"
@@ -193,6 +170,7 @@
         android:id="@+id/brandSpinner1"
         android:layout_width="335dp"
         android:layout_height="35dp"
+        android:layout_marginStart="6dp"
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.21"

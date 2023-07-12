@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/profilePic"
-        android:layout_width="111dp"
-        android:layout_height="100dp"
+        android:layout_width="133dp"
+        android:layout_height="116dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="28dp"
         android:layout_marginEnd="147dp"
@@ -19,22 +19,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/profile_icon" />
 
-    <TextView
-        android:id="@+id/textViewImePrezime"
-        android:layout_width="126dp"
-        android:layout_height="29dp"
-        android:layout_marginStart="76dp"
-        android:layout_marginTop="48dp"
-        android:gravity="center"
-        android:text="TextView"
-        android:textSize="13dp"
-        app:layout_constraintStart_toEndOf="@+id/profilePic"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/carListRecyclerView1"
-        android:layout_width="382dp"
-        android:layout_height="467dp"
+        android:layout_width="384dp"
+        android:layout_height="477dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@+id/leaderboardLayout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="12dp"
         android:text="Your cars:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profilePic" />
@@ -56,23 +44,34 @@
         android:id="@+id/tvScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="28dp"
         android:text="Score:"
         app:layout_constraintStart_toEndOf="@+id/profilePic"
         app:layout_constraintTop_toBottomOf="@+id/textViewImePrezime" />
 
     <TextView
-        android:id="@+id/tvRank"
+        android:id="@+id/tvEMail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="56dp"
-        android:layout_marginTop="20dp"
-        android:text="Rank:"
+        android:layout_marginTop="28dp"
+        android:text="Mail:"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.195"
-        app:layout_constraintStart_toEndOf="@+id/tvScore"
-        app:layout_constraintTop_toBottomOf="@+id/textViewImePrezime" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/profilePic"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewImePrezime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="28dp"
+        android:gravity="center"
+        android:text="TextView"
+        app:layout_constraintStart_toEndOf="@+id/profilePic"
+        app:layout_constraintTop_toBottomOf="@+id/tvEMail" />
 
     <LinearLayout
         android:id="@+id/leaderboardLayout"
@@ -97,7 +96,6 @@
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
     </LinearLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

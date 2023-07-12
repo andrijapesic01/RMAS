@@ -33,6 +33,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private lateinit var profilePicture: ImageView
     private lateinit var fullName: TextView
+    private lateinit var score: TextView
+    private lateinit var email: TextView
     private lateinit var carsRecyclerView: RecyclerView
     private lateinit var carListAdapter: CarListAdapter
     private lateinit var leaderboardBtn: ImageButton
@@ -46,6 +48,8 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
 
         profilePicture = findViewById(R.id.profilePic)
+        score = findViewById(R.id.tvScore)
+        email = findViewById(R.id.tvEMail)
         fullName = findViewById(R.id.textViewImePrezime)
         leaderboardBtn = findViewById(R.id.btnLeaderboard)
 
@@ -77,6 +81,8 @@ class ProfileActivity : AppCompatActivity() {
                         val profilePicUrl = userData["profilePicUrl"] as? String
                         val firstName = userData["firstName"] as? String
                         val lastName = userData["lastName"] as? String
+                        val umail = userData["email"] as? String
+                        val uscore = userData["score"] as? Number
 
                         profilePicUrl?.let {
                             Glide.with(this@ProfileActivity)
@@ -86,6 +92,8 @@ class ProfileActivity : AppCompatActivity() {
 
                         val fullNameText = "$firstName $lastName"
                         fullName.text = fullNameText
+                        email.text = umail
+                        score.text = "Score: " + uscore.toString()
                     }
                 }
             }
@@ -118,7 +126,7 @@ class ProfileActivity : AppCompatActivity() {
                                 carMap["model"] as? String ?: "",
                                 carMap["fuel"] as? String ?: "",
                                 carMap["category"] as? String ?: "",
-                                carMap["year"] as? Int ?: 0,
+                                carMap["year"] as? String ?: "0",
                                 carMap["transmission"] as? String ?: "",
                                 carMap["latitude"] as? Double ?: 0.0,
                                 carMap["longitude"] as? Double ?: 0.0,
