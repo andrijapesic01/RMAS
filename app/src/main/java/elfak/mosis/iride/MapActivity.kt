@@ -138,8 +138,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addMarkersToMap(carList: ArrayList<Car>) {
 
         for (car in carList) {
-            val latitude = car.latitude.toDouble()
-            val longitude = car.longitude.toDouble()
+            val latitude = car.latitude
+            val longitude = car.longitude
             val carLocation = LatLng(latitude, longitude)
 
             val markerOptions = MarkerOptions()
@@ -205,8 +205,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun createLocationRequest() {
         locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            fastestInterval = 5000
+            interval = 5000
+            fastestInterval = 1500
             priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         }
     }
@@ -265,7 +265,5 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             googleMap.isMyLocationEnabled = true
         }
         addMarkersToMap(carList)
-
     }
-
 }

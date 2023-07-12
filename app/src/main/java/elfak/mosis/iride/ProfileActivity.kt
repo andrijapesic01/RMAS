@@ -1,6 +1,7 @@
 package elfak.mosis.iride
 
 import CarListAdapter
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.location.Location
@@ -138,7 +139,6 @@ class ProfileActivity : AppCompatActivity() {
                             carList.add(carObject)
                         }
                     }
-                    Log.d(TAG, "Car List: $carList") // Log the carList contents here
                     carListAdapter.setCars(carList)
                 }
 
@@ -162,8 +162,8 @@ class ProfileActivity : AppCompatActivity() {
         val usersRef = FirebaseDatabase.getInstance().reference.child("users")
 
         usersRef.orderByChild("score").addListenerForSingleValueEvent(object : ValueEventListener {
+            @SuppressLint("SetTextI18n")
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                // Clear previous data
                 leaderboardData.clear()
 
                 for (userSnapshot in dataSnapshot.children) {
@@ -197,12 +197,11 @@ class ProfileActivity : AppCompatActivity() {
                     scoreTextView.gravity = Gravity.CENTER
                     nameTextView.gravity = Gravity.CENTER
 
-                    if (currentUser != null && entry.first == currentUser.uid) {
+                    if ((currentUser != null) && (entry.first == currentUser.uid)) {
                         rankTextView.setTextColor(Color.RED)
                         scoreTextView.setTextColor(Color.RED)
                         nameTextView.setTextColor(Color.RED)
 
-                        // Set the typeface to bold
                         rankTextView.setTypeface(null, Typeface.BOLD)
                         scoreTextView.setTypeface(null, Typeface.BOLD)
                         nameTextView.setTypeface(null, Typeface.BOLD)

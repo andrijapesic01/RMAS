@@ -118,7 +118,6 @@ class LoginActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                 } else {
-
                     checkLocationPermission()
                     //Toast.makeText(this, "Location permission denied. You may not be able to use location-related features.", Toast.LENGTH_SHORT).show()
                 }

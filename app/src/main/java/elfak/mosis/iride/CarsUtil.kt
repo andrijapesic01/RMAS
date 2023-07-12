@@ -11,13 +11,11 @@
     import android.widget.ArrayAdapter
     import android.widget.Button
     import android.widget.EditText
-    import android.widget.ImageButton
     import android.widget.ImageView
     import android.widget.Spinner
     import android.widget.TextView
     import android.widget.Toast
     import androidx.appcompat.app.AlertDialog
-    import androidx.core.content.ContextCompat.startActivity
     import com.bumptech.glide.Glide
     import com.google.android.gms.maps.model.LatLng
     import com.google.firebase.database.DataSnapshot
@@ -188,7 +186,7 @@
             })
         }
 
-        fun retrieveBrands(callback: (List<String>) -> Unit) {
+        private fun retrieveBrands(callback: (List<String>) -> Unit) {
             val brandsRef = storageReference.child("brands.txt")
             brandsRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
                 val brandsText = String(bytes, Charset.forName("UTF-8"))
@@ -201,7 +199,7 @@
             }
         }
 
-        fun retrieveBrandsDialog(dialog: Dialog, spinner: Spinner) {
+        private fun retrieveBrandsDialog(dialog: Dialog, spinner: Spinner) {
             retrieveBrands { brandList->
 
                 val brandAdapter = ArrayAdapter(
@@ -212,7 +210,7 @@
             }
         }
 
-        fun retrieveModels(brand: String, callback: (List<String>) -> Unit) {
+        private fun retrieveModels(brand: String, callback: (List<String>) -> Unit) {
             val lowercaseBrand = brand.trim().lowercase()
             val brandModelsRef = storageReference.child("$lowercaseBrand.txt")
             brandModelsRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
@@ -233,8 +231,7 @@
                     dialog.context, android.R.layout.simple_spinner_item, modelListWithNull
                 )
                 modelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                val modelSpinner = spinner
-                modelSpinner.adapter = modelAdapter
+                spinner.adapter = modelAdapter
             }
 
         }
@@ -261,7 +258,7 @@
 
             textViewCarMake.text = car.brand
             textViewCarModel.text = car.model
-            textViewCarYear.text = car.year.toString()
+            textViewCarYear.text = car.year
             textViewCarCategory.text = car.category
             textViewCarFuelType.text = car.fuel
             textViewCarTransmission.text = car.transmission
@@ -377,7 +374,7 @@
             dialog.show()
         }
 
-        fun filter(context: Context, carList: MutableList<Car>, selectedBrand: String?, selectedModel: String?, selectedCategory: String?, selectedFuelType: String?, selectedTransmissionType: String?, selectedYearFrom: Number?, selectedYearTo: Number?, callback: (MutableList<Car>)-> Unit) {
+        private fun filter(context: Context, carList: MutableList<Car>, selectedBrand: String?, selectedModel: String?, selectedCategory: String?, selectedFuelType: String?, selectedTransmissionType: String?, selectedYearFrom: Number?, selectedYearTo: Number?, callback: (MutableList<Car>)-> Unit) {
             val filteredCars = mutableListOf<Car>()
 
             for (car in carList) {
@@ -405,16 +402,6 @@
             } else {
                 callback(filteredCars)
             }
-        }
-
-        fun sortByRatingAscending(carList: MutableList<Car>, callback: (MutableList<Car>) -> Unit) {
-            carList.sortBy { it.rating.toDouble() }
-            callback(carList)
-        }
-
-        fun sortByRatingDescending(carList: MutableList<Car>, callback: (MutableList<Car>) -> Unit) {
-            carList.sortByDescending { it.rating.toDouble() }
-            callback(carList)
         }
 
         fun calculateDistance(location1: LatLng, location2: LatLng): Float {

@@ -54,12 +54,12 @@ class CarRentActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val MAPVIEW_BUNDLE_KEY = "MapViewBundleKey"
     private val CAMERA_POSITION_KEY = "CameraPositionKey"
-    private var mapViewBundle: Bundle? = null
     private var savedCameraPosition: CameraPosition? = null
     private var startTime: Long = 0L
     private var previousLocation: Location? = null
     private var distanceTraveled: Float = 0F
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_car_rent)
@@ -79,6 +79,7 @@ class CarRentActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createLocationRequest()
         locationCallback = object : LocationCallback() {
+            @SuppressLint("SetTextI18n")
             override fun onLocationResult(locationResult: LocationResult) {
                 val lastLocation = locationResult.lastLocation
                 val yourLocation = LatLng(lastLocation.latitude, lastLocation.longitude)
@@ -110,35 +111,27 @@ class CarRentActivity : AppCompatActivity(), OnMapReadyCallback {
 
         car = (intent.getSerializableExtra("car") as? Car)!!
 
-        if (car != null) {
+        openKey.text = "Open key: " + car.openKey
+        brandModelYear.text = car.brand + "" + car.model + " (" + car.year + ")"
+        tvRating.text = String.format("(%d) %.1f/5", car.numOfRatings.toInt(), car.rating.toFloat())
 
-            openKey.text = "Open key: " + car.openKey
-            brandModelYear.text = car.brand + "" + car.model + " (" + car.year + ")"
-            tvRating.text = String.format("(%d) %.1f/5", car.numOfRatings.toInt(), car.rating.toFloat())
-
-            Glide.with(this)
-                .load(car.carImage)
-                .into(carPic)
-
-        } else {
-            Log.e("Error: ", "Car is null")
-        }
+        Glide.with(this)
+            .load(car.carImage)
+            .into(carPic)
 
         stopBtn.setOnClickListener{
-            if (car != null) {
-                stopRenting(car)
-                showRateDialog(car)
-            }
+            stopRenting(car)
+            showRateDialog(car)
         }
 
         startRenting()
     }
 
+
     private fun startRenting() {
+
         CarUtils.changeCarStatus(car, true)
-
         startTime = System.currentTimeMillis()
-
         startTimer()
         startDistanceTracking()
     }
@@ -163,7 +156,6 @@ class CarRentActivity : AppCompatActivity(), OnMapReadyCallback {
                 val hours = (elapsedTime / (1000 * 60 * 60))
 
                 duration.text = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-
                 duration.postDelayed(this, 1000)
             }
         }
@@ -192,8 +184,8 @@ class CarRentActivity : AppCompatActivity(), OnMapReadyCallback {
         val elapsedTimeInSeconds = (endTime - startTime) / 1000
         val elapsedTimeInHours = elapsedTimeInSeconds / 3600F
 
-        val pointsPerKilometer = 0.1
-        val pointsPerHour = 2
+        val pointsPerKilometer = 1
+        val pointsPerHour = 5
 
         val pointsFromDistance = (distanceTraveled * pointsPerKilometer).toInt()
         val pointsFromTime = (elapsedTimeInHours * pointsPerHour).toInt()
@@ -268,7 +260,7 @@ class CarRentActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView?.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
         outState.putParcelable(CAMERA_POSITION_KEY, savedCameraPosition)
     }
 

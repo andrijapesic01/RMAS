@@ -1,30 +1,19 @@
    package elfak.mosis.iride
 
     import CarListAdapter
-    import android.app.Dialog
+    import android.annotation.SuppressLint
     import android.content.Intent
     import androidx.appcompat.app.AppCompatActivity
     import android.os.Bundle
     import android.util.Log
-    import android.view.View
-    import android.widget.AdapterView
-    import android.widget.ArrayAdapter
-    import android.widget.Button
-    import android.widget.EditText
     import android.widget.ImageButton
-    import android.widget.ImageView
-    import android.widget.Spinner
-    import android.widget.TextView
-    import android.widget.Toast
     import androidx.appcompat.app.AlertDialog
     import androidx.recyclerview.widget.GridLayoutManager
     import androidx.recyclerview.widget.RecyclerView
-    import com.bumptech.glide.Glide
     import com.google.firebase.database.DatabaseReference
     import com.google.firebase.database.FirebaseDatabase
     import com.google.firebase.storage.FirebaseStorage
     import com.google.firebase.storage.StorageReference
-    import java.nio.charset.Charset
     import java.text.SimpleDateFormat
     import java.util.Date
     import java.util.Locale
@@ -87,6 +76,7 @@
             }
         }
 
+       @SuppressLint("NotifyDataSetChanged")
        private fun showFilterDialog() {
            CarUtils.showFilterDialog(this, carList) { filteredCars ->
                carListAdapter.setCars(filteredCars)
@@ -94,6 +84,7 @@
            }
        }
 
+       @SuppressLint("NotifyDataSetChanged")
        private fun showSortDialog() {
            val options = arrayOf("Rating Ascending", "Rating Descending", "Date added: Older", "Date added: Newer")
 
@@ -126,7 +117,7 @@
            builder.create().show()
        }
 
-       fun formatDate(dateInMillis: Long): String {
+       private fun formatDate(dateInMillis: Long): String {
            val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.getDefault())
            val date = Date(dateInMillis)
            return dateFormat.format(date)
@@ -145,7 +136,7 @@
        }
 
         private fun retrieveAllCars() {
-            CarUtils.retrieveAllCars() { cars ->
+            CarUtils.retrieveAllCars { cars ->
                 carList = ArrayList(cars)
                 Log.d("Car List:","$carList")
 

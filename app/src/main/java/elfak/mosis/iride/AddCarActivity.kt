@@ -1,13 +1,10 @@
 package elfak.mosis.iride
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.location.Location
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -15,16 +12,12 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.auth.User
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.ByteArrayOutputStream
@@ -50,7 +43,6 @@ class AddCarActivity : AppCompatActivity() {
     private lateinit var model: String
     private lateinit var transmission: String
 
-    private lateinit var location: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var databaseReference: DatabaseReference
     private lateinit var storage: FirebaseStorage
@@ -151,7 +143,7 @@ class AddCarActivity : AppCompatActivity() {
             val carPicDrawable = carPicture.drawable as BitmapDrawable?
             val carBitmap = carPicDrawable?.bitmap
 
-            if (year == null) {
+            if (year.toIntOrNull() == null) {
                 Toast.makeText(this, "Please add year of production!", Toast.LENGTH_SHORT).show()
             } else if (year.toInt() > maxYear || year.toInt() < 1900) {
                 Toast.makeText(this, "Please enter a valid year of production!", Toast.LENGTH_SHORT).show()
@@ -180,7 +172,7 @@ class AddCarActivity : AppCompatActivity() {
                             val carImageData = baos.toByteArray()
 
                             carImageRef.putBytes(carImageData)
-                                .addOnSuccessListener { uploadTask ->
+                                .addOnSuccessListener {
                                     carImageRef.downloadUrl
                                         .addOnSuccessListener { uri ->
                                             val imageUrl = uri.toString()
@@ -198,22 +190,22 @@ class AddCarActivity : AppCompatActivity() {
                                                                 Toast.makeText(this, "Car added successfully", Toast.LENGTH_SHORT).show()
                                                                 finish()
                                                             }
-                                                            .addOnFailureListener { exception ->
+                                                            .addOnFailureListener {
                                                                 Toast.makeText(this, "Failed to add car", Toast.LENGTH_SHORT).show()
                                                             }
-                                                    }.addOnFailureListener { exception ->
+                                                    }.addOnFailureListener {
                                                         Toast.makeText(this, "Failed to retrieve user score", Toast.LENGTH_SHORT).show()
                                                     }
                                                 }
-                                                .addOnFailureListener { exception ->
+                                                .addOnFailureListener {
                                                     Toast.makeText(this, "Failed to add car", Toast.LENGTH_SHORT).show()
                                                 }
                                         }
-                                        .addOnFailureListener { exception ->
+                                        .addOnFailureListener {
                                             Toast.makeText(this, "Failed to get image URL", Toast.LENGTH_SHORT).show()
                                         }
                                 }
-                                .addOnFailureListener { exception ->
+                                .addOnFailureListener {
                                     Toast.makeText(this, "Failed to upload car image", Toast.LENGTH_SHORT).show()
                                 }
                         }
@@ -269,45 +261,4 @@ class AddCarActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestLocationUpdates() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location ->
-                    if (location != null) {
-                        this.location = location
-                    } else {
-                        Log.e("Location Error", "Location not available!")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("Exception", exception.toString())
-                }
-        } else {
-            showLocationSettingsDialog()
-        }
-    }
-
-    private fun showLocationSettingsDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Location Permission Required")
-            .setMessage("Please grant location permission to use this feature.")
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    LOCATION_PERMISSION_REQUEST_CODE
-                )
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
-    }
 }
